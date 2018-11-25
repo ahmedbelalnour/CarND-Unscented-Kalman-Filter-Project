@@ -67,6 +67,9 @@ public:
   ///* Sigma point spreading parameter
   double lambda_;
 
+ ///* previous time stamp
+  long previous_timestamp_;
+
 
   /**
    * Constructor
@@ -91,6 +94,7 @@ public:
    */
   void Prediction(double delta_t);
 
+	bool isReasonableNewX(const Eigen::VectorXd & newX);
   /**
    * Updates the state and the state covariance matrix using a laser measurement
    * @param meas_package The measurement at k+1
