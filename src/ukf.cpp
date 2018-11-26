@@ -73,7 +73,6 @@ UKF::~UKF() {}
  */
 void UKF::ProcessMeasurement(MeasurementPackage meas_package) {
 
-	std::cout << "enter process measurements\n";
 	/*****************************************************************************
 	*  Initialization
 	****************************************************************************/
@@ -150,8 +149,8 @@ void UKF::ProcessMeasurement(MeasurementPackage meas_package) {
 	}
 
 	// print the output
-	std::cout << "x_ = " << this->x_ << endl;
-	std::cout << "P_ = " << this->P_ << endl;
+	//std::cout << "x_ = " << this->x_ << endl;
+	//std::cout << "P_ = " << this->P_ << endl;
 }
 
 /**
@@ -160,7 +159,6 @@ void UKF::ProcessMeasurement(MeasurementPackage meas_package) {
  * measurement and this one.
  */
 void UKF::Prediction(double delta_t) {
-	cout << "enter prediction\n";
   /**
   TODO:
 
@@ -205,7 +203,7 @@ void UKF::Prediction(double delta_t) {
 	}
 
 	//print result
-	std::cout << "Xsig_aug = " << std::endl << Xsig_aug << std::endl;
+	//std::cout << "Xsig_aug = " << std::endl << Xsig_aug << std::endl;
 
 	/*******************************************************************************
 	* Predict segma points
@@ -259,7 +257,7 @@ void UKF::Prediction(double delta_t) {
 	}
 
 	//print result
-	std::cout << "Xsig_pred = " << std::endl << Xsig_pred_ << std::endl;
+	//std::cout << "Xsig_pred = " << std::endl << Xsig_pred_ << std::endl;
 
 	/*******************************************************************************
 	* Predict mean and covariance
@@ -280,7 +278,7 @@ void UKF::Prediction(double delta_t) {
 		x_ = x_ + weights_(i) * Xsig_pred_.col(i);
 	}
 
-	std::cout << "predicted state out by bakr: " << std::endl;
+	//std::cout << "predicted state out by bakr: " << std::endl;
 
 	//predicted state covariance matrix
 	P_.fill(0.0);
@@ -310,7 +308,6 @@ void UKF::Prediction(double delta_t) {
  * @param {MeasurementPackage} meas_package
  */
 void UKF::UpdateLidar(MeasurementPackage meas_package) {
-	std::cout << "enter update lidar\n";
   /**
   TODO:
 
@@ -352,7 +349,6 @@ void UKF::UpdateLidar(MeasurementPackage meas_package) {
 
 bool UKF::isReasonableNewX(const VectorXd & newX)
 {
-	std::cout << "enter isResonable\n";
 	static int number_of_readings = 0;
 	//ignore the first 4 calls to this function
 	if (number_of_readings < 4)
@@ -383,7 +379,6 @@ bool UKF::isReasonableNewX(const VectorXd & newX)
  * @param {MeasurementPackage} meas_package
  */
 void UKF::UpdateRadar(MeasurementPackage meas_package) {
-	std::cout << "enter update radar\n";
   /**
   TODO:
 
@@ -454,8 +449,8 @@ void UKF::UpdateRadar(MeasurementPackage meas_package) {
 	S = S + R;
 
 	//print result
-	std::cout << "z_pred: " << std::endl << z_pred << std::endl;
-	std::cout << "S: " << std::endl << S << std::endl;
+	//std::cout << "z_pred: " << std::endl << z_pred << std::endl;
+	//std::cout << "S: " << std::endl << S << std::endl;
 
 
 	/*******************************************************************************
