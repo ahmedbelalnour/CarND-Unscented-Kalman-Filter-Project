@@ -126,20 +126,21 @@ int main()
     	  estimate(3) = v2;
     	  
     	  estimations.push_back(estimate);
+		  cout << "before diff\n";
 
-    	  VectorXd RMSE = tools.CalculateRMSE(estimations, ground_truth);
-
+    	 // VectorXd RMSE = tools.CalculateRMSE(estimations, ground_truth);
+		  cout << "after diff\n";
           json msgJson;
           msgJson["estimate_x"] = p_x;
           msgJson["estimate_y"] = p_y;
-          msgJson["rmse_x"] =  RMSE(0);
-          msgJson["rmse_y"] =  RMSE(1);
-          msgJson["rmse_vx"] = RMSE(2);
-          msgJson["rmse_vy"] = RMSE(3);
+          msgJson["rmse_x"] =  1;
+          msgJson["rmse_y"] =  1;
+          msgJson["rmse_vx"] = 1;
+          msgJson["rmse_vy"] = 1;
           auto msg = "42[\"estimate_marker\"," + msgJson.dump() + "]";
-          //std::cout << msg << std::endl;
+          std::cout << msg << std::endl;
           ws->send(msg.data(), msg.length(), uWS::OpCode::TEXT);
-	  
+		  cout << "sent message\n";
         }
       } else {
         
@@ -147,7 +148,7 @@ int main()
         ws->send(msg.data(), msg.length(), uWS::OpCode::TEXT);
       }
     }
-
+	cout << "2tnylt 5last 2l on message\n";
   });
 
   // We don't need this since we're not using HTTP but if it's removed the program

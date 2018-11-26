@@ -60,7 +60,7 @@ UKF::UKF() {
   Hint: one or more values initialized above might be wildly off...
   */
 
-  this->Xsig_pred_ = MatrixXd(n_aug_, 2 * n_aug_ + 1);
+  this->Xsig_pred_ = MatrixXd(n_x_, 2 * n_aug_ + 1);
   this->weights_ = VectorXd(2 * n_aug_ + 1);
 }
 
@@ -72,7 +72,7 @@ UKF::~UKF() {}
  */
 void UKF::ProcessMeasurement(MeasurementPackage meas_package) {
 
-
+	std::cout << "enter process measurements\n";
 	/*****************************************************************************
 	*  Initialization
 	****************************************************************************/
@@ -152,8 +152,8 @@ void UKF::ProcessMeasurement(MeasurementPackage meas_package) {
 	}
 
 	// print the output
-	cout << "x_ = " << this->x_ << endl;
-	cout << "P_ = " << this->P_ << endl;
+	std::cout << "x_ = " << this->x_ << endl;
+	std::cout << "P_ = " << this->P_ << endl;
 }
 
 /**
@@ -162,6 +162,7 @@ void UKF::ProcessMeasurement(MeasurementPackage meas_package) {
  * measurement and this one.
  */
 void UKF::Prediction(double delta_t) {
+	cout << "enter prediction\n";
   /**
   TODO:
 
@@ -276,20 +277,25 @@ void UKF::Prediction(double delta_t) {
 	}
 
 	//predicted state mean
-	x_.fill(0.0);
+	//x_.fill(0.0);
 	for (int i = 0; i < 2 * n_aug_ + 1; i++) {  //iterate over sigma points
 		x_ = x_ + weights_(i) * Xsig_pred_.col(i);
 	}
 
-	//predicted state covariance matrix
-	P_.fill(0.0);
-	for (int i = 0; i < 2 * n_aug_ + 1; i++) {  //iterate over sigma points
+	std::cout << "predicted state out by bakr: " << std::endl;
 
+	//predicted state covariance matrix
+	//P_.fill(0.0);
+	for (int i = 0; i < 2 * n_aug_ + 1; i++) {  //iterate over sigma points
 											   // state difference
 		VectorXd x_diff = Xsig_pred_.col(i) - x_;
 		//angle normalization
-		while (x_diff(3)> M_PI) x_diff(3) -= 2.*M_PI;
-		while (x_diff(3)<-M_PI) x_diff(3) += 2.*M_PI;
+		//cout << "inside loop belal1\n";
+		//while (x_diff(3)> M_PI) x_diff(3) -= 2.*M_PI;
+		//cout << "inside loop belal2\n";
+
+		//while (x_diff(3)<-M_PI) x_diff(3) += 2.*M_PI;
+		//cout << "inside loop belal3\n";
 
 		P_ = P_ + weights_(i) * x_diff * x_diff.transpose();
 	}
@@ -306,6 +312,7 @@ void UKF::Prediction(double delta_t) {
  * @param {MeasurementPackage} meas_package
  */
 void UKF::UpdateLidar(MeasurementPackage meas_package) {
+	std::cout << "enter update lidar\n";
   /**
   TODO:
 
@@ -347,6 +354,7 @@ void UKF::UpdateLidar(MeasurementPackage meas_package) {
 
 bool UKF::isReasonableNewX(const VectorXd & newX)
 {
+	std::cout << "enter isResonable\n";
 	static int number_of_readings = 0;
 	//ignore the first 4 calls to this function
 	if (number_of_readings < 4)
@@ -377,6 +385,7 @@ bool UKF::isReasonableNewX(const VectorXd & newX)
  * @param {MeasurementPackage} meas_package
  */
 void UKF::UpdateRadar(MeasurementPackage meas_package) {
+	std::cout << "enter update radar\n";
   /**
   TODO:
 
