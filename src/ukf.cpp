@@ -29,10 +29,10 @@ UKF::UKF() {
   P_ = MatrixXd(n_x_, n_x_);
 
   // Process noise standard deviation longitudinal acceleration in m/s^2
-  std_a_ = 6;//we need to try 6 as described in lesson3 in the project.
+  std_a_ = 2;//we need to try 6 as described in lesson3 in the project.
 
   // Process noise standard deviation yaw acceleration in rad/s^2
-  std_yawdd_ = 6;//we need to try 6 as described in lesson3 in the project.
+  std_yawdd_ = 0.3;//we need to try 6 as described in lesson3 in the project.
   
   //DO NOT MODIFY measurement noise values below these are provided by the sensor manufacturer.
   // Laser measurement noise standard deviation position1 in m
@@ -60,8 +60,9 @@ UKF::UKF() {
   Hint: one or more values initialized above might be wildly off...
   */
 
-  this->Xsig_pred_ = MatrixXd(n_aug_, 2 * n_aug_ + 1);
+  this->Xsig_pred_ = MatrixXd(n_x_, 2 * n_aug_ + 1);
   this->weights_ = VectorXd(2 * n_aug_ + 1);
+  this->is_initialized_ = false;
 }
 
 UKF::~UKF() {}
@@ -71,7 +72,6 @@ UKF::~UKF() {}
  * either radar or laser.
  */
 void UKF::ProcessMeasurement(MeasurementPackage meas_package) {
-
 
 	/*****************************************************************************
 	*  Initialization
@@ -100,9 +100,6 @@ void UKF::ProcessMeasurement(MeasurementPackage meas_package) {
 		}
 		this->x_(0) = x_reading;
 		this->x_(1) = y_reading;
-		//set 1 to the diagonal matrix
-		/*for (int i = 0;i < 4;++i)
-		this->ekf_.F_(i, i) = 1;*/
 
 		this->P_ << 1, 0, 0, 0, 0,
 					0, 1, 0, 0, 0,
@@ -152,8 +149,8 @@ void UKF::ProcessMeasurement(MeasurementPackage meas_package) {
 	}
 
 	// print the output
-	cout << "x_ = " << this->x_ << endl;
-	cout << "P_ = " << this->P_ << endl;
+	//std::cout << "x_ = " << this->x_ << endl;
+	//std::cout << "P_ = " << this->P_ << endl;
 }
 
 /**
@@ -173,7 +170,7 @@ void UKF::Prediction(double delta_t) {
   ******************************************************************************/
   // Lesson 7. section 18
   //define spreading parameter
-	double lambda = 3 - this->n_aug_;
+	double lambda = 3 - this->n_x_;
 
 	MatrixXd Xsig_aug = MatrixXd(n_aug_, 2 * n_aug_ + 1);
 
@@ -206,7 +203,7 @@ void UKF::Prediction(double delta_t) {
 	}
 
 	//print result
-	std::cout << "Xsig_aug = " << std::endl << Xsig_aug << std::endl;
+	//std::cout << "Xsig_aug = " << std::endl << Xsig_aug << std::endl;
 
 	/*******************************************************************************
 	* Predict segma points
@@ -260,7 +257,7 @@ void UKF::Prediction(double delta_t) {
 	}
 
 	//print result
-	std::cout << "Xsig_pred = " << std::endl << Xsig_pred_ << std::endl;
+	//std::cout << "Xsig_pred = " << std::endl << Xsig_pred_ << std::endl;
 
 	/*******************************************************************************
 	* Predict mean and covariance
@@ -281,15 +278,20 @@ void UKF::Prediction(double delta_t) {
 		x_ = x_ + weights_(i) * Xsig_pred_.col(i);
 	}
 
+	//std::cout << "predicted state out by bakr: " << std::endl;
+
 	//predicted state covariance matrix
 	P_.fill(0.0);
 	for (int i = 0; i < 2 * n_aug_ + 1; i++) {  //iterate over sigma points
-
 											   // state difference
 		VectorXd x_diff = Xsig_pred_.col(i) - x_;
 		//angle normalization
+		//cout << "inside loop belal1\n";
 		while (x_diff(3)> M_PI) x_diff(3) -= 2.*M_PI;
+		//cout << "inside loop belal2\n";
+
 		while (x_diff(3)<-M_PI) x_diff(3) += 2.*M_PI;
+		//cout << "inside loop belal3\n";
 
 		P_ = P_ + weights_(i) * x_diff * x_diff.transpose();
 	}
@@ -447,8 +449,8 @@ void UKF::UpdateRadar(MeasurementPackage meas_package) {
 	S = S + R;
 
 	//print result
-	std::cout << "z_pred: " << std::endl << z_pred << std::endl;
-	std::cout << "S: " << std::endl << S << std::endl;
+	//std::cout << "z_pred: " << std::endl << z_pred << std::endl;
+	//std::cout << "S: " << std::endl << S << std::endl;
 
 
 	/*******************************************************************************
@@ -495,9 +497,11 @@ void UKF::UpdateRadar(MeasurementPackage meas_package) {
 	while (z_diff(1)<-M_PI) z_diff(1) += 2.*M_PI;
 
 	//update state mean and covariance matrix
-	x_ = x_ + K * z_diff;
-	P_ = P_ - K*S*K.transpose();
-
+	VectorXd newX = x_ + K * z_diff;
+	if (isReasonableNewX(newX)) {
+		x_ = newX;
+	    P_ = P_ - K*S*K.transpose();
+	}
 	/*******************************************************************************
 	* Student part end
 	******************************************************************************/
