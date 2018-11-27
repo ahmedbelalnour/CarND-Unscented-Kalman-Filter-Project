@@ -29,10 +29,10 @@ UKF::UKF() {
   P_ = MatrixXd(n_x_, n_x_);
 
   // Process noise standard deviation longitudinal acceleration in m/s^2
-  std_a_ = 3;//we need to try 6 as described in lesson3 in the project.
+  std_a_ = 1;//we need to try 6 as described in lesson3 in the project.
 
   // Process noise standard deviation yaw acceleration in rad/s^2
-  std_yawdd_ = 3;//we need to try 6 as described in lesson3 in the project.
+  std_yawdd_ = 0.5;//we need to try 6 as described in lesson3 in the project.
   
   //DO NOT MODIFY measurement noise values below these are provided by the sensor manufacturer.
   // Laser measurement noise standard deviation position1 in m
@@ -101,11 +101,11 @@ void UKF::ProcessMeasurement(MeasurementPackage meas_package) {
 		this->x_(0) = x_reading;
 		this->x_(1) = y_reading;
 
-		this->P_ << 1, 0, 0, 0, 0,
-					0, 1, 0, 0, 0,
-					0, 0, 1, 0, 0,
-					0, 0, 0, 1, 0,
-		            0, 0, 0, 0, 1;
+		P_ << std_laspx_*std_laspx_, 0, 0, 0, 0,
+			0, std_laspy_*std_laspy_, 0, 0, 0,
+			0, 0, 1, 0, 0,
+			0, 0, 0, 1, 0,
+			0, 0, 0, 0, 1;
 		this->previous_timestamp_ = meas_package.timestamp_;
 
 		// done initializing, no need to predict or update
